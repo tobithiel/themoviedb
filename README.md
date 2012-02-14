@@ -1,6 +1,7 @@
 themoviedb.org wrapper for api v3
 ---
 
+- Old wrapper renamed to themoviedb_oldapi : https://github.com/doganaydin/themoviedb_oldapi
 - Temporarily, only movie search api is implemented
 - Please edit wiki page to add yourself to WhoUses page.
 
