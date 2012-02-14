@@ -2,7 +2,7 @@ themoviedb.org wrapper for api v3
 =================================
 
 - Temporarily, only movie search api is implemented
-
+- Please edit wiki page to add yourself to WhoIsUsed page.
 
 Usage:
 =======
