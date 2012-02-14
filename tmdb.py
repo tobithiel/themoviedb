@@ -10,8 +10,12 @@
 __author__ = "doganaydin"
 __version__ = "0.1"
 
+try:
+    import simplejson
+except:
+    import json as simplejson
 
-import simplejson,requests
+import requests
 
 config = {}
 
@@ -45,11 +49,14 @@ class Core(object):
     def getJSON(self,url):
         url = url.replace(" ","+")
         page = requests.get(url).content
-        return simplejson.loads(page)
+        try:
+            return simplejson.loads(page)
+        except:
+            return simplejson.loads(page.decode('utf-8'))
 
     def update_configuration(self):
-    	c = self.getJSON(config['urls']['config'])
-    	config['api']['backdrop.sizes'] = c['images']['backdrop_sizes']
+        c = self.getJSON(config['urls']['config'])
+        config['api']['backdrop.sizes'] = c['images']['backdrop_sizes']
         config['api']['base.url'] = c['images']['base_url']
         config['api']['poster.sizes'] = c['images']['poster_sizes']
         config['api']['profile.sizes'] = c['images']['profile_sizes']
