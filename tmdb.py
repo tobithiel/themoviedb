@@ -24,7 +24,7 @@ def configure(api_key):
     config['urls'] = {}
     config['urls']['movie.search'] = "http://api.themoviedb.org/3/search/movie?query=%%s&api_key=%(apikey)s&page=%%s" % (config)
     config['urls']['movie.info'] = "http://api.themoviedb.org/3/movie/%%s?api_key=%(apikey)s" % (config)
-    config['urls']['people.search'] = "http://api.themoviedb.org/3/search/person?query=%%s&api_key=%(apikey)s" % (config)
+    config['urls']['people.search'] = "http://api.themoviedb.org/3/search/person?query=%%s&api_key=%(apikey)s&page=%%s" % (config)
     config['urls']['collection.info'] = "http://api.themoviedb.org/3/collection/%%s&api_key=%(apikey)s" % (config)
     config['urls']['movie.alternativetitles'] = "http://api.themoviedb.org/3/movie/%%s/alternative_titles?api_key=%(apikey)s" % (config)
     config['urls']['movie.casts'] = "http://api.themoviedb.org/3/movie/%%s/casts?api_key=%(apikey)s" % (config)
@@ -34,8 +34,8 @@ def configure(api_key):
     config['urls']['movie.trailers'] = "http://api.themoviedb.org/3/movie/%%s/trailers?api_key=%(apikey)s" % (config)
     config['urls']['movie.translations'] = "http://api.themoviedb.org/3/movie/%%s/translations?api_key=%(apikey)s" % (config)
     config['urls']['person.info'] = "http://api.themoviedb.org/3/person/%%s&api_key=%(apikey)s" % (config)
-    config['urls']['person.credits'] = "http://api.themoviedb.org/3/person/%%s/credits&api_key=%(apikey)s" % (config)
-    config['urls']['person.images'] = "http://api.themoviedb.org/3/person/%%s/images&api_key=%(apikey)s" % (config)
+    config['urls']['person.credits'] = "http://api.themoviedb.org/3/person/%%s/credits?api_key=%(apikey)s" % (config)
+    config['urls']['person.images'] = "http://api.themoviedb.org/3/person/%%s/images?api_key=%(apikey)s" % (config)
     config['urls']['latestmovie'] = "http://api.themoviedb.org/3/latest/movie?api_key=%(apikey)s" % (config)
     config['urls']['config'] = "http://api.themoviedb.org/3/configuration?api_key=%(apikey)s" % (config)
 
@@ -70,17 +70,20 @@ class Core(object):
         size_list = {'s':'w92','m':'185','l':'w500','o':'original'}
         return size_list[img_size]
 
+    def profile_sizes(self,img_size):
+        size_list = {'s':'w45','m':'185','l':'w632','o':'original'}
+        return size_list[img_size]
+
 class Movie(Core):
     def __init__(self, title="", id=-1):
-        self.id = id
         self.update_configuration()
         self.movies = self.getJSON(config['urls']['movie.search'] % (title,str(1)))
         self.movies_full = ""
         pages = self.movies["total_pages"]
         for i in range(int(pages)):
             self.movies["results"].extend(self.getJSON(config['urls']['movie.search'] % (title,str(i)))["results"]) 
-        if self.id > -1:
-            self.movies_full = self.getJSON(config['urls']['movie.info'] % self.id)
+        if id > -1:
+            self.movies_full = self.getJSON(config['urls']['movie.info'] % id)
 
     def full_info(self,movie_id):
         self.movies_full = self.getJSON(config['urls']['movie.info'] % str(movie_id))
@@ -214,3 +217,140 @@ class Movie(Core):
         if movie_id > 0:
             self.full_info(movie_id)
         return self.movies_full['vote_count']
+
+
+class People(Core):
+    def __init__(self, people_name, id=-1):
+        self.update_configuration()
+        self.people = self.getJSON(config['urls']['people.search'] % (people_name,str(1)))
+        pages = self.people["total_pages"]
+        self.person = ""
+        self.images = ""
+        for i in range(int(pages)):
+            self.people["results"].extend(self.getJSON(config['urls']['people.search'] % (people_name,i))["results"]) 
+        if id > -1:
+            self.person = self.getJSON(config['urls']['person.info'] % id)
+            self.images = self.getJSON(config['urls']['person.images'] % id)
+
+    def full_info(self,person_id):
+        self.person = self.getJSON(config['urls']['person.info'] % str(person_id))
+        self.images = self.getJSON(config['urls']['person.images'] % str(person_id))
+
+    def get_id(self,people_index=0):
+        return self.people["results"][people_index]["id"]
+
+    def is_adult(self,people_index=0):
+        return self.people["results"][people_index]["adult"]
+
+    def get_name(self,people_index=0):
+        return self.people["results"][people_index]["name"]
+
+    # Sizes = s->w45 m->w185 l->w632 o->original(default)
+    def get_profile_image(self,img_size="o",people_index=0):
+        img_path = self.people["results"][people_index]["profile_path"]
+        return config['api']['base.url']+self.profile_sizes(img_size)+img_path
+
+    def get_biography(self,person_id=0):
+        if person_id > 0:
+            self.full_info(person_id)
+        return self.person['biography']
+
+    def get_birthday(self,person_id=0):
+        if person_id > 0:
+            self.full_info(person_id)
+        return self.person['birthday']
+
+    def get_deathday(self,person_id=0):
+        if person_id > 0:
+            self.full_info(person_id)
+        return self.person['deathday']
+
+    def get_place_of_birth(self,person_id=0):
+        if person_id > 0:
+            self.full_info(person_id)
+        return self.person['place_of_birth']
+
+    def get_homepage(self,person_id=0):
+        if person_id > 0:
+            self.full_info(person_id)
+        return self.person['homepage']
+
+    def get_also_known_as(self,person_id=0):
+        if person_id > 0:
+            self.full_info(person_id)
+        return self.person['also_known_as']
+
+    def get_image_aspect_ratio(self,person_id=0,image_index=0):
+        if person_id > 0:
+            self.full_info(person_id)
+        return self.images['profiles'][image_index]['aspect_ratio']
+
+    def get_image_height(self,person_id=0,image_index=0):
+        if person_id > 0:
+            self.full_info(person_id)
+        return self.images['profiles'][image_index]['height']
+
+    def get_image_width(self,person_id=0,image_index=0):
+        if person_id > 0:
+            self.full_info(person_id)
+        return self.images['profiles'][image_index]['width']
+
+    def get_image_iso_639_1(self,person_id=0,image_index=0):
+        if person_id > 0:
+            self.full_info(person_id)
+        return self.images['profiles'][image_index]['iso_639_1']
+
+    #Sizes = s->w92 m->w185 l->w500 o->original(default)
+    def get_image(self,img_size="o",person_id=0,image_index=0):
+        if person_id > 0:
+            self.full_info(person_id)
+        img_path = self.images['profiles'][image_index]['file_path']
+        return config['api']['base.url']+self.poster_sizes(img_size)+img_path
+
+class Credits(Core):
+    def __init__(self,person_id):
+        self.update_configuration()
+        self.person = self.getJSON(config['urls']['person.credits'] % person_id)
+
+    def get_cast_id(self,person_index=0):
+        return self.person["casts"][person_index]["id"]
+
+    def get_cast_character(self,person_index=0):
+        return self.person["casts"][person_index]["character"]
+
+    def get_cast_original_title(self,person_index=0):
+        return self.person["casts"][person_index]["original_title"]
+
+    def get_cast_title(self,person_index=0):
+        return self.person["casts"][person_index]["title"]
+
+    def get_cast_release_date(self,person_index=0):
+        return self.person["casts"][person_index]["release_date"]
+
+    # Sizes = s->w92 m->w185 l->w500 o->original(default)   
+    def get_cast_poster(self,img_size="o",person_index=0):
+        img_path = self.person["poster_path"]
+        return config['api']['base.url']+self.poster_sizes(img_size)+img_path
+
+    def get_crew_id(self,person_index=0):
+        return self.person["crew"][person_index]["id"]
+
+    def get_crew_department(self,person_index=0):
+        return self.person["crew"][person_index]["department"]
+
+    def get_crew_job(self,person_index=0):
+        return self.person["crew"][person_index]["job"]
+
+    def get_crew_original_title(self,person_index=0):
+        return self.person["crew"][person_index]["original_title"]
+
+    def get_crew_title(self,person_index=0):
+        return self.person["crew"][person_index]["id"]
+
+    def get_crew_release_date(self,person_index=0):
+        return self.person["crew"][person_index]["release_date"]
+
+    # Sizes = s->w92 m->w185 l->w500 o->original(default)   
+    def get_crew_poster(self,img_size="o",person_index=0):
+        img_path = self.person["poster_path"]
+        return config['api']['base.url']+self.poster_sizes(img_size)+img_path
