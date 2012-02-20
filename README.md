@@ -2,25 +2,33 @@ themoviedb.org wrapper for api v3
 ---
 
 - Old wrapper renamed to themoviedb_oldapi : https://github.com/doganaydin/themoviedb_oldapi
-- Temporarily, only movie search api is implemented
+- Temporarily, only movie search api is implemented -
 - Please edit wiki page to add yourself to WhoUses page.
+
+Installation:
+---
+
+- pip install requests
+- (for py2x) sudo python setup.py install
+- (for py3x) sudo python3 setup.py install
+
 
 Usage:
 ---
 
-import tmdb
-tmdb.configure(yourapikey)
-movie = tmdb.Movie("Alien")
-movie.get_id() # or other methods..
+- import tmdb
+- tmdb.configure(yourapikey)
+- movie = tmdb.Movie("Alien")
+- movie.get_id() # or other methods..
 
 For more detailed data..
 
-movie.full_info(movie_id)
-movie.is_adult() #true false
+- movie.full_info(movie_id)
+- movie.is_adult() #true false
 
 or..
 
-movie.is_adult(movie_id)
+- movie.is_adult(movie_id)
 
 This methods usable without movie_id:
 
