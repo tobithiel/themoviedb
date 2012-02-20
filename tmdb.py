@@ -79,14 +79,16 @@ class Core(object):
         return size_list[img_size]
 
 class Movie(Core):
-    def __init__(self, title="", id=-1):
+    def __init__(self, title="", id=-1, limit=False):
+        self.limit = limit
         self.update_configuration()
         title = self.escape(title)
         self.movies = self.getJSON(config['urls']['movie.search'] % (title,str(1)))
         self.movies_full = ""
         pages = self.movies["total_pages"]
-        for i in range(int(pages)):
-            self.movies["results"].extend(self.getJSON(config['urls']['movie.search'] % (title,str(i)))["results"]) 
+        if not self.limit:
+            for i in range(int(pages)):
+                self.movies["results"].extend(self.getJSON(config['urls']['movie.search'] % (title,str(i)))["results"]) 
         if id > -1:
             self.movies_full = self.getJSON(config['urls']['movie.info'] % id)
 
@@ -94,6 +96,8 @@ class Movie(Core):
         self.movies_full = self.getJSON(config['urls']['movie.info'] % str(movie_id))
 
     def get_total_results(self):
+        if self.limit:
+            return len(self.movies["results"])
         return self.movies["total_results"]   
 
     def get_id(self,movie_index=0):
