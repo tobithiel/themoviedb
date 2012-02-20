@@ -47,12 +47,16 @@ def configure(api_key):
 
 class Core(object):
     def getJSON(self,url):
-        url = url.replace(" ","+")
         page = requests.get(url).content
         try:
             return simplejson.loads(page)
         except:
             return simplejson.loads(page.decode('utf-8'))
+
+    def escape(self,text):
+        if len(text) > 0:
+            return requests.utils.quote(text)
+        return False
 
     def update_configuration(self):
         c = self.getJSON(config['urls']['config'])
@@ -77,6 +81,7 @@ class Core(object):
 class Movie(Core):
     def __init__(self, title="", id=-1):
         self.update_configuration()
+        title = self.escape(title)
         self.movies = self.getJSON(config['urls']['movie.search'] % (title,str(1)))
         self.movies_full = ""
         pages = self.movies["total_pages"]
@@ -222,6 +227,7 @@ class Movie(Core):
 class People(Core):
     def __init__(self, people_name, id=-1):
         self.update_configuration()
+        people_name = self.escape(people_name)
         self.people = self.getJSON(config['urls']['people.search'] % (people_name,str(1)))
         pages = self.people["total_pages"]
         self.person = ""
