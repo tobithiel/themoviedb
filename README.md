@@ -12,6 +12,17 @@ Installation:
 - (for py2x) sudo python setup.py install
 - (for py3x) sudo python3 setup.py install
 
+User Authentication:
+---
+
+    import tmdb
+    tmdb.configure(yourapikey)
+    auth = tmdb.Core()
+    rt = tmdb.request_token()
+    #{"url":"http://themoviedb.org/authenticate/request_token","request_token":"requested_token"}
+    auth.session_id(rt["request_token"])
+    #return session_id
+
 
 Usage:
 ---
