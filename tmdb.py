@@ -4,7 +4,6 @@
 #project:themoviedb
 #repository:http://github.com/doganaydin/themoviedb
 #license: LGPLv3 http://www.gnu.org/licenses/lgpl.html
-
 """An interface to the themoviedb.org API"""
 
 __author__ = "doganaydin"
@@ -38,12 +37,16 @@ def configure(api_key):
     config['urls']['person.images'] = "http://api.themoviedb.org/3/person/%%s/images?api_key=%(apikey)s" % (config)
     config['urls']['latestmovie'] = "http://api.themoviedb.org/3/latest/movie?api_key=%(apikey)s" % (config)
     config['urls']['config'] = "http://api.themoviedb.org/3/configuration?api_key=%(apikey)s" % (config)
-
+    config['urls']['request.token'] = "http://api.themoviedb.org/3/authentication/token/new?api_key=%(apikey)s" % (config)
+    config['urls']['session.id'] = "http://api.themoviedb.org/3/authentication/session/new?api_key=%(apikey)s&request_token=%%s" % (config)
+    config['urls']['movie.add.rating'] = "http://api.themoviedb.org/3/movie/%%s/rating?session_id=%%s&api_key=%(apikey)s" % (config)
     config['api'] = {}
     config['api']['backdrop.sizes'] = ""
     config['api']['base.url'] = ""
     config['api']['poster.sizes'] = ""
     config['api']['profile.sizes'] = ""
+    config['api']['session.id'] = ""
+
 
 class Core(object):
     def getJSON(self,url):
@@ -77,6 +80,16 @@ class Core(object):
     def profile_sizes(self,img_size):
         size_list = {'s':'w45','m':'185','l':'w632','o':'original'}
         return size_list[img_size]
+
+    def request_token(self):
+        req = self.getJSON(config['urls']['request.token'])
+        r = req["request_token"]
+        return {"url":"http://themoviedb.org/authenticate/%s" % r,"request_token":r}
+
+    def session_id(self,token):
+        sess = self.getJSON(config['urls']['session.id'] % token)
+        config['api']['session.id'] = sess["session_id"]
+        return sess["session_id"]
 
 class Movie(Core):
     def __init__(self, title="", id=-1, limit=False):
@@ -227,6 +240,21 @@ class Movie(Core):
             self.full_info(movie_id)
         return self.movies_full['vote_count']
 
+    def add_rating(self,value,movie_id=0):
+        if isinstance(value,float) or isinstance(value,int):
+            if movie_id > 0:
+                self.full_info(movie_id)
+            if config["api"]["session.id"] == "":
+                return "PROBLEM_AUTH"
+            sess_id = config["api"]["session.id"]
+            data = {"value":float(value)}
+            req = requests.post(config['urls']['movie.add.rating'] % (movie_id,sess_id),data=data)
+            res = simplejson.loads(req.content)
+            if res['status_message'] == "Success":
+                return True
+            else:
+                return False
+        return "ERROR"
 
 class People(Core):
     def __init__(self, people_name, id=-1):
