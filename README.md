@@ -8,9 +8,9 @@ themoviedb.org wrapper for api v3
 Installation:
 ---
 
-- pip install requests
-- (for py2x) sudo python setup.py install
-- (for py3x) sudo python3 setup.py install
+    pip install requests
+    (for py2x) sudo python setup.py install
+    (for py3x) sudo python3 setup.py install
 
 User Authentication:
 ---
@@ -27,19 +27,19 @@ User Authentication:
 Usage:
 ---
 
-- import tmdb
-- tmdb.configure(yourapikey)
-- movie = tmdb.Movie("Alien")
-- movie.get_id() # or other methods..
+    import tmdb
+    tmdb.configure(yourapikey)
+    movie = tmdb.Movie("Alien")
+    movie.get_id() # or other methods..
 
 For more detailed data..
 
-- movie.full_info(movie_id)
-- movie.is_adult() #true false
+    movie.full_info(movie_id)
+    movie.is_adult() #true false
 
 or..
 
-- movie.is_adult(movie_id)
+    movie.is_adult(movie_id)
 
 This methods usable without movie_id:
 
