@@ -18,7 +18,7 @@ User Authentication:
     import tmdb
     tmdb.configure(yourapikey)
     auth = tmdb.Core()
-    rt = tmdb.request_token()
+    rt = auth.request_token()
     #{"url":"http://themoviedb.org/authenticate/request_token","request_token":"requested_token"}
     auth.session_id(rt["request_token"])
     #return session_id
@@ -31,6 +31,11 @@ Usage:
     tmdb.configure(yourapikey)
     movie = tmdb.Movie("Alien")
     movie.get_id() # or other methods..
+    movie.full_info(movie_id)
+    auth = tmdb.Core()
+    rt = auth.request_token()
+    auth.session_id(rt["request_token"])
+    movie.add_rating(1)
 
 For more detailed data..
 
