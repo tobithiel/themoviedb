@@ -106,6 +106,12 @@ class Movie(Core):
             self.get_movie(id)
         else:
             self.search_movie(title, limit)
+        self.keywords = None
+        self.releases = None
+        self.alternative_titles = None
+        self.translations = None
+        self.cast = None
+        self.trailers = None
 
     def get_movie(self, id):
         self.full_info(id)
@@ -152,6 +158,67 @@ class Movie(Core):
     def get_poster(self,img_size="o",movie_index=0):
         img_path = self.movies["results"][movie_index]["poster_path"]
         return config['api']['base.url']+self.poster_sizes(img_size)+img_path
+
+
+    def get_keywords(self,movie_id=0):
+        if self.keywords == None:
+            if movie_id == 0:
+                movie_id = self.movies_full['id']
+            self.keywords = self.getJSON(config['urls']['movie.keywords'] % str(movie_id))
+        return self.keywords['keywords']
+
+    def get_trailers(self,movie_id=0):
+        if self.trailers == None:
+            if movie_id == 0:
+                movie_id = self.movies_full['id']
+            self.trailers = self.getJSON(config['urls']['movie.trailers'] % (str(movie_id)),self.language)
+        return self.trailers
+
+    def get_cast(self,movie_id=0):
+        if self.cast == None:
+            if movie_id == 0:
+                movie_id = self.movies_full['id']
+            self.cast = self.getJSON(config['urls']['movie.casts'] % str(movie_id))
+        return self.cast
+
+    def get_releases(self,country=None,movie_id=0):
+        if self.releases == None:
+            if movie_id == 0:
+                movie_id = self.movies_full['id']
+            self.releases = self.getJSON(config['urls']['movie.releases'] % str(movie_id))
+        if country != None:
+            country = country.lower()
+            for release in self.releases['countries']:
+                if country == release['iso_3166_1'].lower():
+                    return release
+            return {}
+        return self.releases['countries']
+
+    def get_translations(self,language=None,movie_id=0):
+        if self.translations == None:
+            if movie_id == 0:
+                movie_id = self.movies_full['id']
+            self.translations = self.getJSON(config['urls']['movie.translations'] % str(movie_id))
+        if language != None:
+            language = language.lower()
+            for translation in self.translations['translations']:
+                if language == translation['iso_639_1'].lower():
+                    return translation
+            return {}
+        return self.translations['translations']
+
+    def get_alternative_titles(self,country=None,movie_id=0):
+        if self.alternative_titles == None:
+            if movie_id == 0:
+                movie_id = self.movies_full['id']
+            self.alternative_titles = self.getJSON(config['urls']['movie.alternativetitles'] % str(movie_id))
+        if country != None:
+            country = country.lower()
+            for title in self.alternative_titles['titles']:
+                if country == title['iso_3166_1'].lower():
+                    return title
+            return {}
+        return self.alternative_titles['titles']
 
     def is_adult(self,movie_id=0):
         if movie_id > 0:
