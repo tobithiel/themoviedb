@@ -230,6 +230,11 @@ class Movie(Core):
             self.full_info(movie_id)
         return self.movies_full['adult']
 
+    def is_in_collection(self,movie_id=0):
+        if movie_id > 0:
+            self.full_info(movie_id)
+        return self.movies_full['belongs_to_collection'] != None
+
     def get_collection_id(self,movie_id=0):
         if movie_id > 0:
             self.full_info(movie_id)
