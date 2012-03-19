@@ -47,6 +47,8 @@ def configure(api_key):
     config['api']['profile.sizes'] = ""
     config['api']['session.id'] = ""
 
+class TmdbConnectionException(Exception):
+    pass
 
 class Core(object):
     def getJSON(self,url,language=None):
@@ -56,7 +58,10 @@ class Core(object):
             else:
                 url += "&language=%s"
             url = url % (language)
-        page = requests.get(url).content
+        response = requests.get(url)
+        if response.status_code >= 300:
+            raise TmdbConnectionException, 'received status code ' + str(response.status_code)
+        page = response.content
         try:
             return simplejson.loads(page)
         except:
