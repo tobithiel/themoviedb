@@ -292,7 +292,7 @@ class Movie(Core):
         if movie_id > 0:
             self.full_info(movie_id)
         for i in self.movies_full['production_countries']:
-            countries = {"iso_3166":i["iso_3166"],"name":i["name"]}
+            countries = {"iso_3166_1":i["iso_3166_1"],"name":i["name"]}
         return countries
 
     def get_revenue(self,movie_id=0):
