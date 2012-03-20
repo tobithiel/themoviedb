@@ -267,8 +267,9 @@ class Movie(Core):
     def get_genres(self,movie_id=0):
         if movie_id > 0:
             self.full_info(movie_id)
+        genres = []
         for i in self.movies_full['genres']:
-            genres = {"id":i["id"],"name":i["name"]}
+            genres.append({"id":i["id"],"name":i["name"]})
         return genres
 
     def get_homepage(self,movie_id=0):
@@ -289,15 +290,17 @@ class Movie(Core):
     def get_production_companies(self,movie_id=0):
         if movie_id > 0:
             self.full_info(movie_id)
+        companies = []
         for i in self.movies_full['production_companies']:
-            companies = {"id":i["id"],"name":i["name"]}
+            companies.append({"id":i["id"],"name":i["name"]})
         return companies
 
     def get_productions_countries(self,movie_id=0):
         if movie_id > 0:
             self.full_info(movie_id)
+        countries = []
         for i in self.movies_full['production_countries']:
-            countries = {"iso_3166_1":i["iso_3166_1"],"name":i["name"]}
+            countries.append({"iso_3166_1":i["iso_3166_1"],"name":i["name"]})
         return countries
 
     def get_revenue(self,movie_id=0):
@@ -313,8 +316,9 @@ class Movie(Core):
     def get_spoken_languages(self,movie_id=0):
         if movie_id > 0:
             self.full_info(movie_id)
+        langs = []
         for i in self.movies_full['spoken_languages']:
-            langs = {"iso_639_1":i["iso_639_1"],"name":i["name"]}
+            langs.append({"iso_639_1":i["iso_639_1"],"name":i["name"]})
         return langs
 
     def get_tagline(self,movie_id=0):
