@@ -61,7 +61,7 @@ class Core(object):
         response = requests.get(url)
         # check http status code
         if not response.status_code == 200:
-            raise TmdbAPIException, 'received status code ' + str(response.status_code)
+            raise TmdbAPIException, 'received http status code ' + str(response.status_code)
         # parse json
         page = response.content
         try:
@@ -72,7 +72,7 @@ class Core(object):
         if 'status_code' in json and 'status_message' in json:
             raise TmdbAPIException, json['status_message']
         elif 'status_code' in json:
-            raise TmdbAPIException, 'received status code ' + str(json['status_code'])
+            raise TmdbAPIException, 'received tmdb status code ' + str(json['status_code'])
         return json
 
     def escape(self,text):
