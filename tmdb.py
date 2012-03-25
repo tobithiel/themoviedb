@@ -47,7 +47,7 @@ def configure(api_key):
     config['api']['profile.sizes'] = ""
     config['api']['session.id'] = ""
 
-class TmdbConnectionException(Exception):
+class TmdbAPIException(Exception):
     pass
 
 class Core(object):
@@ -59,13 +59,21 @@ class Core(object):
                 url += "&language=%s"
             url = url % (language)
         response = requests.get(url)
-        if response.status_code >= 300:
-            raise TmdbConnectionException, 'received status code ' + str(response.status_code)
+        # check http status code
+        if not response.status_code == 200:
+            raise TmdbAPIException, 'received status code ' + str(response.status_code)
+        # parse json
         page = response.content
         try:
-            return simplejson.loads(page)
+            json = simplejson.loads(page)
         except:
-            return simplejson.loads(page.decode('utf-8'))
+            json = simplejson.loads(page.decode('utf-8'))
+        # check for error response
+        if 'status_code' in json and 'status_message' in json:
+            raise TmdbAPIException, json['status_message']
+        elif 'status_code' in json:
+            raise TmdbAPIException, 'received status code ' + str(json['status_code'])
+        return json
 
     def escape(self,text):
         if len(text) > 0:
