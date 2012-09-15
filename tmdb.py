@@ -136,7 +136,7 @@ class Movie(Core):
         self.movies_full = ""
         pages = self.movies["total_pages"]
         if not self.limit:
-            for i in range(int(pages)):
+            for i in range(2, int(pages)):
                 self.movies["results"].extend(self.getJSON(config['urls']['movie.search'] % (title,str(i)), self.language)["results"])
 
     def full_info(self,movie_id):
@@ -368,7 +368,7 @@ class People(Core):
         pages = self.people["total_pages"]
         self.person = ""
         self.images = ""
-        for i in range(int(pages)):
+        for i in range(2, int(pages)):
             self.people["results"].extend(self.getJSON(config['urls']['people.search'] % (people_name,i))["results"]) 
         if id > -1:
             self.person = self.getJSON(config['urls']['person.info'] % id)
